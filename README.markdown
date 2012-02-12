@@ -1,12 +1,12 @@
 # Loco
 
-Loco is an iOS library that attempts to acquire the device location via GPS whenever a significant change in location has been detected (typically by changing cellular towers). The application can also force attempting to acquire the location instead of waiting for this condition. Loco also provides a listener interface so that clients can easily be notified of changes in location and other events.
+Loco is an iOS library that attempts to acquire the device location using GPS whenever a significant location change, or change in cellular towers, is detected. By doing so it strikes a balance between accurately finding your **lo**cation and **co**nserving the battery of your device. Other features include allowing the application to force attempting to acquire the location using GPS at any time, a listener interface for easy notification of changes in location and other events, and pausing and resuming location of monitoring.
 
 ## API
 
 ### LocationManager
 
-TODO: describe the locationmanager
+The `LocationManager` is responsible for monitoring changes in cellular towers and acquiring the location using GPS in response. It also handles prompting the user to authorize the application use to location services, acquiring the location using GPS anytime the application desires, and notifying registered listeners of changes in location and other events.
 
 * `+ (LocationManager *) sharedInstance`: Returns the `LocationManager` singleton.
 
@@ -20,11 +20,19 @@ TODO: describe the locationmanager
 
 * `- (void) forceAcquireLocation`: Attempts to acquire the device location using GPS instead of waiting for a change in cellular towers to trigger acquisition.
 
-TODO: include the properties
+Additionally, the `LocationManager` has the following read-only properties:
+
+* `LocationState locationState`: An enumeration defining the state of the `LocationManager`. See the values below.
+
+* `CLLocation *location`: The last location acquired using GPS, or `nil` if no such location has been acquired yet.
+
+* `BOOL isPaused`: Returns whether monitoring for any changes in location has been paused.
+
+* `NSMutableArray *listeners`: The mutable array through which listeners can be registered or unregistered. See the description of the listener protocol below.
 
 ### LocationManagerState
 
-The `LocationManagerState` enum specifies what the `LocationManager` is currently doing:
+The `LocationManagerState` enumeration specifies what the `LocationManager` is currently doing:
 
 * `LocationStateInit`: The application has not prompted the user yet for authorization to use location services.
 
@@ -64,7 +72,12 @@ A protocol that can be adopted by any class that wants to be notified of changes
 
 ## Demo Application
 
-If you are looking to use Loco in your own application, simply copy `LocationManager.h`, `LocationManager.m`, and `LocationManagerListener.h` into your project.
+If you are looking to use Loco in your own application, simply copy `LocationManager.h`, `LocationManager.m`, and `LocationManagerListener.h` from the `loco` subdirectory into your project.
 
-TODO: describe the demo program
+The other files in the repository are part of the XCode project `loco.xcodeproj`, which defines a simple application that demonstrates how Loco works. After authorizing the application use of location services, the application allows you to:
+
+  * pause and resume monitoring for changes in cellular towers
+  * force acquiring the location using GPS
+  * watch your location update on the map
+  * inspect which listener methods are called
 
