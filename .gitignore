@@ -1,0 +1,13 @@
+# git conflicts
+*.orig
+
+# xcode
+build/
+*.pbxuser
+*mode1v3
+xcuserdata
+
+# osx
+.DS_Store
+profile
+
