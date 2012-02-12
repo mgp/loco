@@ -1,0 +1,280 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F04E177B14E72CEE000B5F41 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F04E177A14E72CEE000B5F41 /* UIKit.framework */; };
+		F04E177D14E72CEE000B5F41 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F04E177C14E72CEE000B5F41 /* Foundation.framework */; };
+		F04E177F14E72CEE000B5F41 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F04E177E14E72CEE000B5F41 /* CoreGraphics.framework */; };
+		F04E178514E72CEE000B5F41 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F04E178314E72CEE000B5F41 /* InfoPlist.strings */; };
+		F04E178714E72CEE000B5F41 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F04E178614E72CEE000B5F41 /* main.m */; };
+		F04E178B14E72CEE000B5F41 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F04E178A14E72CEE000B5F41 /* AppDelegate.m */; };
+		F04E178E14E72CEE000B5F41 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F04E178D14E72CEE000B5F41 /* ViewController.m */; };
+		F04E179F14E73245000B5F41 /* LocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F04E179D14E73245000B5F41 /* LocationManager.m */; };
+		F04E17A114E7337A000B5F41 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F04E17A014E7337A000B5F41 /* CoreLocation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		F04E177614E72CEE000B5F41 /* loco.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = loco.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F04E177A14E72CEE000B5F41 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		F04E177C14E72CEE000B5F41 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		F04E177E14E72CEE000B5F41 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		F04E178214E72CEE000B5F41 /* loco-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "loco-Info.plist"; sourceTree = "<group>"; };
+		F04E178414E72CEE000B5F41 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		F04E178614E72CEE000B5F41 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		F04E178814E72CEE000B5F41 /* loco-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "loco-Prefix.pch"; sourceTree = "<group>"; };
+		F04E178914E72CEE000B5F41 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		F04E178A14E72CEE000B5F41 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		F04E178C14E72CEE000B5F41 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		F04E178D14E72CEE000B5F41 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		F04E179C14E73245000B5F41 /* LocationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationManager.h; sourceTree = "<group>"; };
+		F04E179D14E73245000B5F41 /* LocationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationManager.m; sourceTree = "<group>"; };
+		F04E179E14E73245000B5F41 /* LocationManagerListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationManagerListener.h; sourceTree = "<group>"; };
+		F04E17A014E7337A000B5F41 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F04E177314E72CEE000B5F41 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F04E17A114E7337A000B5F41 /* CoreLocation.framework in Frameworks */,
+				F04E177B14E72CEE000B5F41 /* UIKit.framework in Frameworks */,
+				F04E177D14E72CEE000B5F41 /* Foundation.framework in Frameworks */,
+				F04E177F14E72CEE000B5F41 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F04E176B14E72CEE000B5F41 = {
+			isa = PBXGroup;
+			children = (
+				F04E17A014E7337A000B5F41 /* CoreLocation.framework */,
+				F04E178014E72CEE000B5F41 /* loco */,
+				F04E177914E72CEE000B5F41 /* Frameworks */,
+				F04E177714E72CEE000B5F41 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F04E177714E72CEE000B5F41 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F04E177614E72CEE000B5F41 /* loco.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F04E177914E72CEE000B5F41 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F04E177A14E72CEE000B5F41 /* UIKit.framework */,
+				F04E177C14E72CEE000B5F41 /* Foundation.framework */,
+				F04E177E14E72CEE000B5F41 /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F04E178014E72CEE000B5F41 /* loco */ = {
+			isa = PBXGroup;
+			children = (
+				F04E179C14E73245000B5F41 /* LocationManager.h */,
+				F04E179D14E73245000B5F41 /* LocationManager.m */,
+				F04E179E14E73245000B5F41 /* LocationManagerListener.h */,
+				F04E178914E72CEE000B5F41 /* AppDelegate.h */,
+				F04E178A14E72CEE000B5F41 /* AppDelegate.m */,
+				F04E178C14E72CEE000B5F41 /* ViewController.h */,
+				F04E178D14E72CEE000B5F41 /* ViewController.m */,
+				F04E178114E72CEE000B5F41 /* Supporting Files */,
+			);
+			path = loco;
+			sourceTree = "<group>";
+		};
+		F04E178114E72CEE000B5F41 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F04E178214E72CEE000B5F41 /* loco-Info.plist */,
+				F04E178314E72CEE000B5F41 /* InfoPlist.strings */,
+				F04E178614E72CEE000B5F41 /* main.m */,
+				F04E178814E72CEE000B5F41 /* loco-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F04E177514E72CEE000B5F41 /* loco */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F04E179414E72CEE000B5F41 /* Build configuration list for PBXNativeTarget "loco" */;
+			buildPhases = (
+				F04E177214E72CEE000B5F41 /* Sources */,
+				F04E177314E72CEE000B5F41 /* Frameworks */,
+				F04E177414E72CEE000B5F41 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = loco;
+			productName = loco;
+			productReference = F04E177614E72CEE000B5F41 /* loco.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F04E176D14E72CEE000B5F41 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
+			buildConfigurationList = F04E177014E72CEE000B5F41 /* Build configuration list for PBXProject "loco" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = F04E176B14E72CEE000B5F41;
+			productRefGroup = F04E177714E72CEE000B5F41 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F04E177514E72CEE000B5F41 /* loco */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F04E177414E72CEE000B5F41 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F04E178514E72CEE000B5F41 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F04E177214E72CEE000B5F41 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F04E178714E72CEE000B5F41 /* main.m in Sources */,
+				F04E178B14E72CEE000B5F41 /* AppDelegate.m in Sources */,
+				F04E178E14E72CEE000B5F41 /* ViewController.m in Sources */,
+				F04E179F14E73245000B5F41 /* LocationManager.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		F04E178314E72CEE000B5F41 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F04E178414E72CEE000B5F41 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		F04E179214E72CEE000B5F41 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		F04E179314E72CEE000B5F41 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F04E179514E72CEE000B5F41 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "loco/loco-Prefix.pch";
+				INFOPLIST_FILE = "loco/loco-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		F04E179614E72CEE000B5F41 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "loco/loco-Prefix.pch";
+				INFOPLIST_FILE = "loco/loco-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F04E177014E72CEE000B5F41 /* Build configuration list for PBXProject "loco" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F04E179214E72CEE000B5F41 /* Debug */,
+				F04E179314E72CEE000B5F41 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F04E179414E72CEE000B5F41 /* Build configuration list for PBXNativeTarget "loco" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F04E179514E72CEE000B5F41 /* Debug */,
+				F04E179614E72CEE000B5F41 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F04E176D14E72CEE000B5F41 /* Project object */;
+}
