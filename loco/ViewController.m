@@ -133,6 +133,7 @@ typedef enum {
   [button addTarget:self
              action:@selector(resume)
    forControlEvents:UIControlEventTouchUpInside];
+  button.frame = CGRectMake(0, 10, 300, kButtonHeight);
   [button setTitle:@"Start" forState:UIControlStateNormal];
 
   // Show the button in the table header.
@@ -187,11 +188,78 @@ typedef enum {
 
 - (NSInteger) tableView:(UITableView *)tableView
   numberOfRowsInSection:(NSInteger)section {
-  return 1;
+  return [events count];
 }
 
-- (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-  static NSString *CellIdentifier = @"CellIdentifier";
+- (NSString *) tableView:(UITableView *)tableView
+ titleForHeaderInSection:(NSInteger)section {
+  return @"Location Events";
+}
+
+- (NSString *) tableView:(UITableView *)tableView
+ titleForFooterInSection:(NSInteger)section {
+  if ([events count] == 0) {
+    return @"No events yet";
+  }
+  return nil;
+}
+
+- (NSString *) stringFromCoordinate:(CLLocationCoordinate2D)coordinate {
+  return [NSString stringWithFormat:@"lat=%f, lon=%f",
+          coordinate.latitude,
+          coordinate.longitude];
+}
+
+- (NSString *) stringFromLocationState:(LocationState)locationState {
+  switch (locationState) {
+    case LocationStateUnknown:
+      return @"Unknown";
+    case LocationStatePrompted:
+      return @"Prompted";
+    case LocationStateDenied:
+      return @"Denied";
+    case LocationStateWaitingSignificantChange:
+      return @"WaitingSignificantChange";
+    case LocationStateAcquiringBest:
+      return @"AcquiringBest";
+    case LocationStateAcquiringBestFailed:
+      return @"AcquiringBestFailed";
+    default:
+      break;
+  }
+  return nil;
+}
+
+- (UITableViewCell *) cellForStatusAtRow:(NSUInteger)row {
+  static NSString *CellIdentifier = @"StatusCellIdentifier";
+  UITableViewCell *cell = [self.tableView
+                           dequeueReusableCellWithIdentifier:CellIdentifier];
+  if (cell == nil) {
+    cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1
+                                   reuseIdentifier:CellIdentifier]
+            autorelease];
+    // TODO: set font sizes
+  }
+  
+  switch (row) {
+    case 0:
+      cell.textLabel.text = @"State";
+      cell.detailTextLabel.text = [self
+                                   stringFromLocationState:locationManager.locationState];
+      break;
+    case 1:
+      cell.textLabel.text = @"Coords";
+      cell.detailTextLabel.text = [self
+                                   stringFromCoordinate:locationManager.location.coordinate];
+      break;
+    default:
+      break;
+  }
+  return cell;
+}
+
+- (UITableViewCell *) cellForEventAtRow:(NSUInteger)row {
+  static NSString *CellIdentifier = @"EventCellIdentifier";
   UITableViewCell *cell = [self.tableView
                            dequeueReusableCellWithIdentifier:CellIdentifier];
   if (cell == nil) {
@@ -202,12 +270,24 @@ typedef enum {
     cell.detailTextLabel.font = [UIFont systemFontOfSize:11];
   }
   
-  // The most recent is the last element in the array.
-  NSUInteger index = [events count] - 1 - indexPath.row;
+  // The most recent event is the last element in the array.
+  NSUInteger index = [events count] - 1 - row;
   LocationEvent *event = [events objectAtIndex:index];
   cell.textLabel.text = [event title];
   cell.detailTextLabel.text = event.subtitle;
   return cell;
+}
+
+- (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+  switch (indexPath.section) {
+    case 0:
+      return [self cellForStatusAtRow:indexPath.row];
+    case 1:
+      return [self cellForEventAtRow:indexPath.row];
+    default:
+      break;
+  }
+  return nil;
 }
 
 #pragma mark - LocationManagerListener methods.
@@ -231,32 +311,6 @@ typedef enum {
 
 - (void) addLocationEventWithType:(LocationEventType)type {
   [self addLocationEventWithType:type subtitle:nil];
-}
-
-- (NSString *) stringFromLocationState:(LocationState)locationState {
-  switch (locationState) {
-    case LocationStateUnknown:
-      return @"LocationStateUnknown";
-    case LocationStatePrompted:
-      return @"LocationStatePrompted";
-    case LocationStateDenied:
-      return @"LocationStateDenied";
-    case LocationStateWaitingSignificantChange:
-      return @"LocationStateWaitingSignificantChange";
-    case LocationStateAcquiringBest:
-      return @"LocationStateAcquiringBest";
-    case LocationStateAcquiringBestFailed:
-      return @"LocationStateAcquiringBestFailed";
-    default:
-      break;
-  }
-  return nil;
-}
-
-- (NSString *) stringFromCoordinate:(CLLocationCoordinate2D)coordinate {
-  return [NSString stringWithFormat:@"lat=%f, lon=%f",
-          coordinate.latitude,
-          coordinate.longitude];
 }
 
 - (void) setLocationState:(LocationState)locationState {

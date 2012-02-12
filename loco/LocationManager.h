@@ -28,8 +28,9 @@ typedef enum {
   NSMutableArray *locationManagerListeners;
 }
 
-@property (nonatomic, readonly) BOOL isPaused;
 @property (nonatomic, readonly) LocationState locationState;
+@property (nonatomic, readonly) CLLocation *location;
+@property (nonatomic, readonly) BOOL isPaused;
 @property (nonatomic, readonly) NSMutableArray *locationManagerListeners;
 
 + (LocationManager *) sharedInstance;
