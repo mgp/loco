@@ -8,8 +8,8 @@
 @protocol LocationManagerListener <NSObject>
 @optional
 
-- (void) setLocationState:(LocationState)locationState;
 - (void) setLocation:(CLLocationCoordinate2D)coordinate;
+- (void) setLocationState:(LocationState)locationState;
 
 - (void) accessPrompted;
 - (void) accessGranted;
