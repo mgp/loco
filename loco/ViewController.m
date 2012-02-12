@@ -1,16 +1,24 @@
 #import "ViewController.h"
 
+#import <MapKit/MapKit.h>
+
 typedef enum {
   LocationEventTypeSetLocationState,
   LocationEventTypeSetLocation,
   LocationEventTypeAccessPrompted,
   LocationEventTypeAccessGranted,
   LocationEventTypeForceAcquireBestLocation,
+  LocationEventTypeStaleSignificantChangeDetected,
+  LocationEventTypeCurrentSignificantChangeDetected,
+  LocationEventTypeStaleAccurateLocationFound,
+  LocationEventTypeCurrentAccurateLocationFound,
   LocationEventTypeAccessDenied,
   LocationEventTypeAcquiringLocationFailed,
   LocationEventTypeAcquiringLocationPaused,
   LocationEventTypeAcquiringLocationResumed,
 } LocationEventType;
+
+#define kButtonHeight 40
 
 @interface LocationEvent : NSObject {
 @private
@@ -45,6 +53,32 @@ typedef enum {
 
 - (NSString *) title {
   switch (type) {
+    case LocationEventTypeSetLocationState:
+      return @"SetLocationState";
+    case LocationEventTypeSetLocation:
+      return @"SetLocation";
+    case LocationEventTypeAccessPrompted:
+      return @"AccessPrompted";
+    case LocationEventTypeAccessGranted:
+      return @"AccessGranted";
+    case LocationEventTypeForceAcquireBestLocation:
+      return @"ForceAcquireBestLocation";
+    case LocationEventTypeStaleSignificantChangeDetected:
+      return @"StaleSignificantChangeDetected";
+    case LocationEventTypeCurrentSignificantChangeDetected:
+      return @"CurrentSignificantChangeDetected";
+    case LocationEventTypeStaleAccurateLocationFound:
+      return @"StaleAccurateLocationFound";
+    case LocationEventTypeCurrentAccurateLocationFound:
+      return @"CurrentAccurateLocationFound";
+    case LocationEventTypeAccessDenied:
+      return @"LocationEventTypeAccessDenied";
+    case LocationEventTypeAcquiringLocationFailed:
+      return @"AcquiringLocationFailed";
+    case LocationEventTypeAcquiringLocationPaused:
+      return @"AcquiringLocationPaused";
+    case LocationEventTypeAcquiringLocationResumed:
+      return @"AcquiringLocationResumed";
     default:
       break;
   }
@@ -60,12 +94,91 @@ typedef enum {
 
 - (id) init {
   self = [super initWithStyle:UITableViewStyleGrouped];
+  if (self) {
+    locationManager = [[LocationManager sharedInstance] retain];
+    events = [[NSMutableArray alloc] init];
+  }
   return self;
+}
+
+- (void) dealloc {
+  [locationManager release];
+  [events release];
+  
+  [tableViewHeader release];
+  [mapView release];
+  
+  [super dealloc];
+}
+
+- (void) pause {
+  [locationManager pause];
+}
+
+- (void) resume {
+  [locationManager resume];
+}
+
+- (void) removeTableViewHeader {
+  [tableViewHeader removeFromSuperview];
+  [tableViewHeader release];
+  tableViewHeader = nil;
+}
+
+- (void) showStartTableHeader {
+  [self removeTableViewHeader];
+  
+  // Create the button.
+  UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+  [button addTarget:self
+             action:@selector(resume)
+   forControlEvents:UIControlEventTouchUpInside];
+  [button setTitle:@"Start" forState:UIControlStateNormal];
+
+  // Show the button in the table header.
+  CGSize buttonSize = button.frame.size;
+  tableViewHeader =
+      [[UIView alloc]
+       initWithFrame:CGRectMake(0, 0, 320, buttonSize.height)];
+  [tableViewHeader addSubview:button];
 }
 
 - (void) viewDidLoad {
   [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+  
+  self.title = @"Loco Demo";
+  [self showStartTableHeader];
+}
+
+- (void) showMapTableHeader {
+  [self removeTableViewHeader];
+  
+  // Create the map.
+  mapView = [[MKMapView alloc]
+             initWithFrame:CGRectMake(kButtonHeight + 10, 10, 300, 300)];
+  
+  // Create the Pause button.
+  UIButton *pauseButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+  [pauseButton addTarget:self
+                  action:@selector(pause)
+        forControlEvents:UIControlEventTouchUpInside];
+  pauseButton.frame = CGRectMake(0, 10, 145, kButtonHeight);
+  [pauseButton setTitle:@"Pause" forState:UIControlStateNormal];
+  
+  // Create the resume button.
+  UIButton *resumeButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+  [resumeButton addTarget:self
+                   action:@selector(resume)
+         forControlEvents:UIControlEventTouchUpInside];
+  resumeButton.frame = CGRectMake(0, 165, 145, kButtonHeight);
+  [resumeButton setTitle:@"Resume" forState:UIControlStateNormal];
+  
+  // Add everything to the table header.
+  tableViewHeader = [[UIView alloc]
+                     initWithFrame:CGRectMake(0, 0, 320, kButtonHeight + 310)];
+  [tableViewHeader addSubview:mapView];
+  [tableViewHeader addSubview:pauseButton];
+  [tableViewHeader addSubview:resumeButton];
 }
 
 - (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView {
@@ -85,6 +198,8 @@ typedef enum {
     cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
                                    reuseIdentifier:CellIdentifier]
             autorelease];
+    cell.textLabel.font = [UIFont boldSystemFontOfSize:13];
+    cell.detailTextLabel.font = [UIFont systemFontOfSize:11];
   }
   
   // The most recent is the last element in the array.
@@ -170,32 +285,27 @@ typedef enum {
 
 - (void) staleSignificantChangeDetected:(CLLocation *)location {
   NSString *subtitle = [self stringFromCoordinate:location.coordinate];
-  
+  [self addLocationEventWithType:LocationEventTypeStaleSignificantChangeDetected
+                        subtitle:subtitle];
 }
 
 - (void) currentSignificantChangeDetected:(CLLocation *)location {
   NSString *subtitle = [self stringFromCoordinate:location.coordinate];
-  
+  [self
+   addLocationEventWithType:LocationEventTypeCurrentSignificantChangeDetected
+   subtitle:subtitle];
 }
 
-- (void) staleFirstLocationFound:(CLLocation *)location {
+- (void) staleAccurateLocationFound:(CLLocation *)location {
   NSString *subtitle = [self stringFromCoordinate:location.coordinate];
-  
+  [self addLocationEventWithType:LocationEventTypeStaleAccurateLocationFound
+                        subtitle:subtitle];
 }
 
-- (void) currentFirstLocationFound:(CLLocation *)location {
+- (void) currentAccurateLocationFound:(CLLocation *)location {
   NSString *subtitle = [self stringFromCoordinate:location.coordinate];
-  
-}
-
-- (void) staleNextLocationFound:(CLLocation *)location {
-  NSString *subtitle = [self stringFromCoordinate:location.coordinate];
-  
-}
-
-- (void) currentNextLocationFound:(CLLocation *)location {
-  NSString *subtitle = [self stringFromCoordinate:location.coordinate];
-  
+  [self addLocationEventWithType:LocationEventTypeCurrentAccurateLocationFound
+                        subtitle:subtitle];
 }
 
 - (void) accessDenied {

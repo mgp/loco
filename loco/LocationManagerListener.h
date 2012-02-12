@@ -16,10 +16,8 @@
 - (void) forceAcquireBestLocation;
 - (void) staleSignificantChangeDetected:(CLLocation *)location;
 - (void) currentSignificantChangeDetected:(CLLocation *)location;
-- (void) staleFirstLocationFound:(CLLocation *)location;
-- (void) currentFirstLocationFound:(CLLocation *)location;
-- (void) staleNextLocationFound:(CLLocation *)location;
-- (void) currentNextLocationFound:(CLLocation *)location;
+- (void) staleAccurateLocationFound:(CLLocation *)location;
+- (void) currentAccurateLocationFound:(CLLocation *)location;
 - (void) accessDenied;
 - (void) acquiringLocationFailed;
 - (void) acquiringLocationPaused;

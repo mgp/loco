@@ -16,6 +16,7 @@
 		F04E178E14E72CEE000B5F41 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F04E178D14E72CEE000B5F41 /* ViewController.m */; };
 		F04E179F14E73245000B5F41 /* LocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F04E179D14E73245000B5F41 /* LocationManager.m */; };
 		F04E17A114E7337A000B5F41 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F04E17A014E7337A000B5F41 /* CoreLocation.framework */; };
+		F0D764EF14E768E40055A064 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0D764EE14E768E40055A064 /* MapKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,7 @@
 		F04E179D14E73245000B5F41 /* LocationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationManager.m; sourceTree = "<group>"; };
 		F04E179E14E73245000B5F41 /* LocationManagerListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationManagerListener.h; sourceTree = "<group>"; };
 		F04E17A014E7337A000B5F41 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		F0D764EE14E768E40055A064 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,6 +44,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F0D764EF14E768E40055A064 /* MapKit.framework in Frameworks */,
 				F04E17A114E7337A000B5F41 /* CoreLocation.framework in Frameworks */,
 				F04E177B14E72CEE000B5F41 /* UIKit.framework in Frameworks */,
 				F04E177D14E72CEE000B5F41 /* Foundation.framework in Frameworks */,
@@ -55,6 +58,7 @@
 		F04E176B14E72CEE000B5F41 = {
 			isa = PBXGroup;
 			children = (
+				F0D764EE14E768E40055A064 /* MapKit.framework */,
 				F04E17A014E7337A000B5F41 /* CoreLocation.framework */,
 				F04E178014E72CEE000B5F41 /* loco */,
 				F04E177914E72CEE000B5F41 /* Frameworks */,
