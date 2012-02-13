@@ -1,6 +1,6 @@
 # Loco
 
-Loco is an iOS library that attempts to acquire the device location using GPS whenever a significant location change, or change in cellular towers, is detected. By doing so it strikes a balance between accurately finding your **lo**cation and **co**nserving the battery of your device. Other features include allowing the application to force attempting to acquire the location using GPS at any time, a listener interface for easy notification of changes in location and other events, and pausing and resuming location of monitoring.
+Loco is an iOS library that attempts to acquire the device location using GPS whenever a significant location change, or change in cellular towers, is detected. By doing so it strikes a balance between accurately finding your **lo**cation and **co**nserving the battery of your device. Other features include allowing the application to force attempting to acquire the location using GPS at any time, a listener interface for easy notification of changes in location and other events, and pausing and resuming monitoring of location.
 
 ## API
 
@@ -37,7 +37,7 @@ The `LocationManagerState` enumeration specifies what the `LocationManager` is c
 
 A protocol that can be adopted by any class that wants to be notified of changes in location or changes to the state of the `LocationManager`. All methods are marked `optional`. To register or unregister listeners, simply add or remove them from the `listeners` property of the `LocationManager` instance.
 
-* `- (void) setLocation:(CLLocationCoordinate2D)coordinate`: Called whenever the `LocationManager` determines a new location using GPS.
+* `- (void) setLocation:(CLLocation *)location`: Called whenever the `LocationManager` determines a new location using GPS.
 * `- (void) setLocationState:(LocationState)locationState`: Called whenever the state of the `LocationManager` updates.
 * `- (void) accessPrompted`: Called whenever the application prompts the user for authorization to use location services.
 * `- (void) accessGranted`: Called if the user grants the application authorization to use location services.

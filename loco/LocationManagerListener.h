@@ -8,17 +8,13 @@
 @protocol LocationManagerListener <NSObject>
 @optional
 
-- (void) setLocation:(CLLocationCoordinate2D)coordinate;
+- (void) setLocation:(CLLocation *)coordinate;
 - (void) setLocationState:(LocationState)locationState;
-
 - (void) accessPrompted;
 - (void) accessGranted;
-- (void) forceAcquireBestLocation;
-- (void) staleSignificantChangeDetected:(CLLocation *)location;
-- (void) currentSignificantChangeDetected:(CLLocation *)location;
-- (void) staleAccurateLocationFound:(CLLocation *)location;
-- (void) currentAccurateLocationFound:(CLLocation *)location;
 - (void) accessDenied;
+- (void) forceAcquireBestLocation;
+- (void) significantChangeDetected:(CLLocation *)location;
 - (void) acquiringLocationFailed;
 - (void) acquiringLocationPaused;
 - (void) acquiringLocationResumed;

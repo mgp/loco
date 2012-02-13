@@ -10,33 +10,34 @@
 #define kMaxSecondsRecentUpdate 30
 // Maximum number of failed location update attempts until retrying later.
 #define kMaxFailedUpdateAttempts 5
+// TODO
+#define kMaxGpsOnTime 15
 
 @synthesize locationState;
-@synthesize locationManagerListeners;
+@synthesize location;
+@synthesize listeners;
 
 static LocationManager *singleton;
 
 - (id) init {
   self = [super init];
   if (self) {
+    locationState = LocationStateInit;
+    listeners = [[NSMutableArray alloc] init];
+
     manager = [[CLLocationManager alloc] init];
     manager.delegate = self;
     failedUpdateAttempts = 0;
-    isPaused = NO;
-    
-    locationState = LocationStateUnknown;
-    
-    locationManagerListeners = [[NSMutableArray alloc] init];
   }
   return self;
 }
 
 - (void) dealloc {
+  [location release];
+  [listeners release];
+
   [manager release];
   [significantChangeTimestamp release];
-  [exactLocationTimestamp release];
-  
-  [locationManagerListeners release];
 
   [super dealloc];
 }
@@ -50,22 +51,22 @@ static LocationManager *singleton;
 
 - (void) setLocationState:(LocationState)locationStateParam {
   locationState = locationStateParam;
-  for (NSObject<LocationManagerListener> *listener in locationManagerListeners) {
+  for (NSObject<LocationManagerListener> *listener in listeners) {
     if ([listener respondsToSelector:@selector(setLocationState:)]) {
       [listener setLocationState:locationState];
     }
   }
 }
 
-- (void) stopAcquiringAccurateLocation {
-  for (NSObject<LocationManagerListener> *listener in locationManagerListeners) {
+- (void) stopAcquiringLocation {
+  for (NSObject<LocationManagerListener> *listener in listeners) {
     if ([listener respondsToSelector:@selector(setLocation:)]) {
-      [listener setLocation:exactLocation];
+      [listener setLocation:location];
     }
   }
   NSLog(@"New location found, lat=%f, lon=%f",
-        exactLocation.latitude,
-        exactLocation.longitude);
+        location.coordinate.latitude,
+        location.coordinate.longitude);
   
   // Switch back to monitoring significant location changes.
   [manager stopUpdatingLocation];
@@ -73,21 +74,19 @@ static LocationManager *singleton;
   [manager startMonitoringSignificantLocationChanges];
 }
 
-- (void) acquiringAccurateLocationTimerExpired {
-  [self stopAcquiringAccurateLocation];
+- (void) acquiringLocationTimerExpired {
+  [self stopAcquiringLocation];
 }
 
 - (void) cancelAcquiringAccurateLocationTimer {
   [NSObject
    cancelPreviousPerformRequestsWithTarget:self
-   selector:@selector(acquiringAccurateLocationTimerExpired)
+   selector:@selector(acquiringLocationTimerExpired)
    object:nil];
 }
 
-#define kMaxGpsOnTime 15
-
-- (void) startAcquiringAccurateLocationTimer {
-  [self performSelector:@selector(acquiringAccurateLocationTimerExpired)
+- (void) startAcquiringLocationTimer {
+  [self performSelector:@selector(acquiringLocationTimerExpired)
              withObject:nil
              afterDelay:kMaxGpsOnTime];
 }
@@ -98,7 +97,7 @@ static LocationManager *singleton;
   [manager startUpdatingLocation];
   
   // Do not use GPS forever.
-  [self startAcquiringAccurateLocationTimer];
+  [self startAcquiringLocationTimer];
 }
 
 - (void) promptEnableLocationAccess {
@@ -106,7 +105,7 @@ static LocationManager *singleton;
   [self setLocationState:LocationStatePrompted];
   [self startAcquiringAccurateLocation];
   
-  for (NSObject<LocationManagerListener> *listener in locationManagerListeners) {
+  for (NSObject<LocationManagerListener> *listener in listeners) {
     if ([listener respondsToSelector:@selector(accessPrompted)]) {
       [listener accessPrompted];
     }
@@ -114,15 +113,13 @@ static LocationManager *singleton;
 }
 
 - (void) tryPromptEnableLocationAccess {
-  if ((locationState == LocationStateUnknown) ||
-      (locationState == LocationStateAcquiringBestFailed)) {
+  if (locationState == LocationStateInit) {
     [self promptEnableLocationAccess];
   }
 }
 
 - (void) forcePromptEnableLocationAccess {
-  if ((locationState == LocationStateUnknown) ||
-      (locationState == LocationStateAcquiringBestFailed) ||
+  if ((locationState == LocationStateInit) ||
       (locationState == LocationStateDenied)) {
     [self promptEnableLocationAccess];
   }
@@ -135,16 +132,14 @@ static LocationManager *singleton;
     return;
   }
   
-  if ((exactLocationAccuracy < 0) ||
-      (newLocation.horizontalAccuracy < exactLocationAccuracy)) {
-    exactLocation = newLocation.coordinate;
-    exactLocationAccuracy = newLocation.horizontalAccuracy;
-    exactLocationTimestamp = [newLocation.timestamp retain];
+  if ((location == nil) ||
+      (newLocation.horizontalAccuracy < location.horizontalAccuracy)) {
+    location = newLocation;
     
     // Less than ten meters is sufficiently close.
-    if (exactLocationAccuracy < kCLLocationAccuracyNearestTenMeters) {
+    if (location.horizontalAccuracy < kCLLocationAccuracyNearestTenMeters) {
       [self cancelAcquiringAccurateLocationTimer];
-      [self stopAcquiringAccurateLocation];
+      [self stopAcquiringLocation];
     }
   }
 }
@@ -154,92 +149,71 @@ static LocationManager *singleton;
 - (void) locationManager:(CLLocationManager *)managerParam
      didUpdateToLocation:(CLLocation *)newLocation
             fromLocation:(CLLocation *)oldLocation {
-  if (isPaused) {
-    return;
+  if ((locationState == LocationStateInit) ||
+      (locationState == LocationStateDenied) ||
+      (locationState == LocationStatePaused)) {
+    NSLog(@"Got new location when locationState=%d", locationState);
   }
   
   failedUpdateAttempts = 0;
-  if (locationState == LocationStateDenied) {
-    NSLog(@"Got new location when access denied");
-    return;
-  }
   if (locationState == LocationStatePrompted) {
-    // Location access was granted, and acquisition succeeded.
-    [self setLocationState:LocationStateAcquiringBest];
-    
-    for (NSObject<LocationManagerListener> *listener in locationManagerListeners) {
+    [self setLocationState:LocationStateAcquiring];
+
+    for (NSObject<LocationManagerListener> *listener in listeners) {
       if ([listener respondsToSelector:@selector(accessGranted)]) {
         [listener accessGranted];
       }
     }
+
+    // Already attempting to acquire location using GPS.
+    return;
   }
 
   if (locationState == LocationStateWaitingSignificantChange) {
-    NSTimeInterval secondsSinceExactLocation = [newLocation.timestamp
-                                                timeIntervalSinceDate:exactLocationTimestamp];
-    if (secondsSinceExactLocation < kMinSecondsSignificantChange) {
-      for (NSObject<LocationManagerListener> *listener in locationManagerListeners) {
-        if ([listener respondsToSelector:@selector(staleSignificantChangeDetected:)]) {
-          [listener staleSignificantChangeDetected:newLocation];
-        }
+    if (location != nil) {
+      // Ignore change if acquired location using GPS recently.
+      NSTimeInterval secondsSinceExactLocation = [newLocation.timestamp
+                                                  timeIntervalSinceDate:location.timestamp];
+      if (secondsSinceExactLocation < kMinSecondsSignificantChange) {
+        return;
       }
-      return;
     }
     
-    for (NSObject<LocationManagerListener> *listener in locationManagerListeners) {
+    for (NSObject<LocationManagerListener> *listener in listeners) {
       if ([listener respondsToSelector:@selector(currentSignificantChangeDetected:)]) {
-        [listener currentSignificantChangeDetected:newLocation];
+        [listener significantChangeDetected:newLocation];
       }
     }
     
-    // Found a current significant change comparing against the exact location timestamp.
-    [exactLocationTimestamp release];
-    exactLocationTimestamp = nil;
     // Exact location is found comparing to current significant change timestamp.
+    [significantChangeTimestamp release];
     significantChangeTimestamp = [newLocation.timestamp retain];
 
     [manager stopMonitoringSignificantLocationChanges];
     
     // Get a more accurate location.
     [self startAcquiringAccurateLocation];
-    [self setLocationState:LocationStateAcquiringBest];
-  } else if (locationState == LocationStateAcquiringBest) {
+    [self setLocationState:LocationStateAcquiring];
+    return;
+  }
+  
+  if (locationState == LocationStateAcquiring) {
     if (significantChangeTimestamp == nil) {
       // Acquiring the first location; make it recent.
       NSTimeInterval locationAgeInSeconds = [[NSDate date]
                                              timeIntervalSinceDate:newLocation.timestamp];
       if (locationAgeInSeconds < kMaxSecondsRecentUpdate) {
-        for (NSObject<LocationManagerListener> *listener in locationManagerListeners) {
-          if ([listener respondsToSelector:@selector(currentFirstLocationFound:)]) {
-            [listener currentFirstLocationFound:newLocation];
-          }
-        }
-
         [self updateToLocation:newLocation];
       } else {
-        for (NSObject<LocationManagerListener> *listener in locationManagerListeners) {
-          if ([listener respondsToSelector:@selector(staleFirstLocationFound:)]) {
-            [listener staleFirstLocationFound:newLocation];
-          }
-        }
+        NSLog(@"First location with GPS is stale");
       }
     } else {
       // Wait for a location acquired after the significant location change.
       if ([newLocation.timestamp
            compare:significantChangeTimestamp] == NSOrderedDescending) {
-        for (NSObject<LocationManagerListener> *listener in locationManagerListeners) {
-          if ([listener respondsToSelector:@selector(currentNextLocationFound:)]) {
-            [listener currentNextLocationFound:newLocation];
-          }
-        }
-
         [self updateToLocation:newLocation];
       } else {
-        for (NSObject<LocationManagerListener> *listener in locationManagerListeners) {
-          if ([listener respondsToSelector:@selector(staleNextLocationFound:)]) {
-            [listener staleNextLocationFound:newLocation];
-          }
-        }
+        NSLog(@"Next location with GPS is stale");
       }
     }
   }
@@ -308,12 +282,8 @@ static LocationManager *singleton;
   }
 }
 
-- (BOOL) isPaused {
-  return isPaused;
-}
-
 - (void) pause {
-  if ((locationState == LocationStateUnknown) || 
+  if ((locationState == LocationStateInit) || 
       (locationState == LocationStatePrompted) ||
       (locationState == LocationStateDenied)) {
     return;
@@ -371,7 +341,7 @@ static LocationManager *singleton;
 }
 
 - (void) forceAcquireBestLocation {
-  if (!isPaused && (locationState == LocationStateWaitingSignificantChange)) {
+  if (locationState == LocationStateWaitingSignificantChange)) {
     [exactLocationTimestamp release];
     exactLocationTimestamp = nil;
     
