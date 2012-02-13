@@ -19,6 +19,7 @@ typedef enum {
   NSMutableArray *listeners;
 
   CLLocationManager *manager;
+  CLLocation *acquiringLocation;
   NSDate *significantChangeTimestamp;
   NSUInteger failedUpdateAttempts;
 }
