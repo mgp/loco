@@ -7,12 +7,9 @@ typedef enum {
   LocationEventTypeSetLocation,
   LocationEventTypeAccessPrompted,
   LocationEventTypeAccessGranted,
-  LocationEventTypeForceAcquireBestLocation,
-  LocationEventTypeStaleSignificantChangeDetected,
-  LocationEventTypeCurrentSignificantChangeDetected,
-  LocationEventTypeStaleAccurateLocationFound,
-  LocationEventTypeCurrentAccurateLocationFound,
   LocationEventTypeAccessDenied,
+  LocationEventTypeForceAcquireLocation,
+  LocationEventTypeSignificantChangeDetected,
   LocationEventTypeAcquiringLocationFailed,
   LocationEventTypeAcquiringLocationPaused,
   LocationEventTypeAcquiringLocationResumed,
@@ -61,18 +58,12 @@ typedef enum {
       return @"AccessPrompted";
     case LocationEventTypeAccessGranted:
       return @"AccessGranted";
-    case LocationEventTypeForceAcquireBestLocation:
-      return @"ForceAcquireBestLocation";
-    case LocationEventTypeStaleSignificantChangeDetected:
-      return @"StaleSignificantChangeDetected";
-    case LocationEventTypeCurrentSignificantChangeDetected:
-      return @"CurrentSignificantChangeDetected";
-    case LocationEventTypeStaleAccurateLocationFound:
-      return @"StaleAccurateLocationFound";
-    case LocationEventTypeCurrentAccurateLocationFound:
-      return @"CurrentAccurateLocationFound";
     case LocationEventTypeAccessDenied:
-      return @"LocationEventTypeAccessDenied";
+      return @"AccessDenied";
+    case LocationEventTypeForceAcquireLocation:
+      return @"ForceAcquireLocation";
+    case LocationEventTypeSignificantChangeDetected:
+      return @"SignificantChangeDetected";
     case LocationEventTypeAcquiringLocationFailed:
       return @"AcquiringLocationFailed";
     case LocationEventTypeAcquiringLocationPaused:
@@ -204,7 +195,8 @@ typedef enum {
   return nil;
 }
 
-- (NSString *) stringFromCoordinate:(CLLocationCoordinate2D)coordinate {
+- (NSString *) stringFromLocation:(CLLocation *)location {
+  CLLocationCoordinate2D coordinate = location.coordinate;
   return [NSString stringWithFormat:@"lat=%f, lon=%f",
           coordinate.latitude,
           coordinate.longitude];
@@ -212,18 +204,18 @@ typedef enum {
 
 - (NSString *) stringFromLocationState:(LocationState)locationState {
   switch (locationState) {
-    case LocationStateUnknown:
-      return @"Unknown";
+    case LocationStateInit:
+      return @"Init";
     case LocationStatePrompted:
       return @"Prompted";
     case LocationStateDenied:
       return @"Denied";
     case LocationStateWaitingSignificantChange:
       return @"WaitingSignificantChange";
-    case LocationStateAcquiringBest:
-      return @"AcquiringBest";
-    case LocationStateAcquiringBestFailed:
-      return @"AcquiringBestFailed";
+    case LocationStateAcquiring:
+      return @"Acquiring";
+    case LocationStatePaused:
+      return @"Paused";
     default:
       break;
   }
@@ -250,7 +242,7 @@ typedef enum {
     case 1:
       cell.textLabel.text = @"Coords";
       cell.detailTextLabel.text = [self
-                                   stringFromCoordinate:locationManager.location.coordinate];
+                                   stringFromLocation:locationManager.location];
       break;
     default:
       break;
@@ -313,15 +305,15 @@ typedef enum {
   [self addLocationEventWithType:type subtitle:nil];
 }
 
-- (void) setLocationState:(LocationState)locationState {
-  NSString *subtitle = [self stringFromLocationState:locationState];
-  [self addLocationEventWithType:LocationEventTypeSetLocationState
+- (void) setLocation:(CLLocation *)location {
+  NSString *subtitle = [self stringFromLocation:location];
+  [self addLocationEventWithType:LocationEventTypeSetLocation
                         subtitle:subtitle];
 }
 
-- (void) setLocation:(CLLocationCoordinate2D)coordinate {
-  NSString *subtitle = [self stringFromCoordinate:coordinate];
-  [self addLocationEventWithType:LocationEventTypeSetLocation
+- (void) setLocationState:(LocationState)locationState {
+  NSString *subtitle = [self stringFromLocationState:locationState];
+  [self addLocationEventWithType:LocationEventTypeSetLocationState
                         subtitle:subtitle];
 }
 
@@ -333,37 +325,18 @@ typedef enum {
   [self addLocationEventWithType:LocationEventTypeAccessGranted];
 }
 
-- (void) forceAcquireBestLocation {
-  [self addLocationEventWithType:LocationEventTypeForceAcquireBestLocation];
-}
-
-- (void) staleSignificantChangeDetected:(CLLocation *)location {
-  NSString *subtitle = [self stringFromCoordinate:location.coordinate];
-  [self addLocationEventWithType:LocationEventTypeStaleSignificantChangeDetected
-                        subtitle:subtitle];
-}
-
-- (void) currentSignificantChangeDetected:(CLLocation *)location {
-  NSString *subtitle = [self stringFromCoordinate:location.coordinate];
-  [self
-   addLocationEventWithType:LocationEventTypeCurrentSignificantChangeDetected
-   subtitle:subtitle];
-}
-
-- (void) staleAccurateLocationFound:(CLLocation *)location {
-  NSString *subtitle = [self stringFromCoordinate:location.coordinate];
-  [self addLocationEventWithType:LocationEventTypeStaleAccurateLocationFound
-                        subtitle:subtitle];
-}
-
-- (void) currentAccurateLocationFound:(CLLocation *)location {
-  NSString *subtitle = [self stringFromCoordinate:location.coordinate];
-  [self addLocationEventWithType:LocationEventTypeCurrentAccurateLocationFound
-                        subtitle:subtitle];
-}
-
 - (void) accessDenied {
   [self addLocationEventWithType:LocationEventTypeAccessDenied];
+}
+
+- (void) forceAcquireLocation {
+  [self addLocationEventWithType:LocationEventTypeForceAcquireLocation];
+}
+
+- (void) significantChangeDetected:(CLLocation *)location {
+  NSString *subtitle = [self stringFromLocation:location];
+  [self addLocationEventWithType:LocationEventTypeSignificantChangeDetected
+                        subtitle:subtitle];
 }
 
 - (void) acquiringLocationFailed {

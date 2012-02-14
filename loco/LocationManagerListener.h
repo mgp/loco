@@ -13,7 +13,7 @@
 - (void) accessPrompted;
 - (void) accessGranted;
 - (void) accessDenied;
-- (void) forceAcquireBestLocation;
+- (void) forceAcquireLocation;
 - (void) significantChangeDetected:(CLLocation *)location;
 - (void) acquiringLocationFailed;
 - (void) acquiringLocationPaused;

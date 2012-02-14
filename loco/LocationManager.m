@@ -359,7 +359,7 @@ static LocationManager *singleton;
     [self setLocationState:LocationStateAcquiring];
     for (NSObject<LocationManagerListener> *listener in listeners) {
       if ([listener respondsToSelector:@selector(forceAcquireBestLocation)]) {
-        [listener forceAcquireBestLocation];
+        [listener forceAcquireLocation];
       }
     }
   }
