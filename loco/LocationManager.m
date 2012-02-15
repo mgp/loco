@@ -121,6 +121,10 @@ static LocationManager *singleton;
 - (void) stopAcquiringLocation {
   [self cancelAcquiringLocationTimer];
   [manager stopUpdatingLocation];
+  
+  // The timestamp will be set after detecting a significant change in location.
+  [significantChangeTimestamp release];
+  significantChangeTimestamp = nil;
 }
 
 - (void) startAcquiringLocation {
@@ -196,7 +200,7 @@ static LocationManager *singleton;
     }
     
     // Exact location is found comparing to current significant change timestamp.
-    [significantChangeTimestamp release];
+    NSAssert(significantChangeTimestamp == nil, @"Timestamp already assigned");
     significantChangeTimestamp = [newLocation.timestamp retain];
     // Get a more accurate location.
     [self stopMonitoringSignificantChanges];
@@ -314,9 +318,6 @@ static LocationManager *singleton;
   } else if (locationState == LocationStateAcquiring) {
     [self stopAcquiringLocation];
   }
-  // TODO: clear this on only one branch of the conditional
-  [significantChangeTimestamp release];
-  significantChangeTimestamp = nil;
 
   locationState = LocationStatePaused;
   for (NSObject<LocationManagerListener> *listener in listeners) {
