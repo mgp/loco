@@ -207,7 +207,7 @@ static LocationManager *singleton;
     [self startAcquiringLocation];
 
     for (NSObject<LocationManagerListener> *listener in listeners) {
-      if ([listener respondsToSelector:@selector(currentSignificantChangeDetected:)]) {
+      if ([listener respondsToSelector:@selector(significantChangeDetected:)]) {
         [listener significantChangeDetected:newLocation];
       }
     }
@@ -239,7 +239,7 @@ static LocationManager *singleton;
     }
     
     if ((acquiringLocation == nil) ||
-        (newLocation.horizontalAccuracy < acquiringLocation.horizontalAccuracy)) {
+        (newLocation.horizontalAccuracy <= acquiringLocation.horizontalAccuracy)) {
       [acquiringLocation release];
       acquiringLocation = [newLocation retain];
       
@@ -345,7 +345,7 @@ static LocationManager *singleton;
     [self startAcquiringLocation];
     
     for (NSObject<LocationManagerListener> *listener in listeners) {
-      if ([listener respondsToSelector:@selector(forceAcquireBestLocation)]) {
+      if ([listener respondsToSelector:@selector(forceAcquireLocation)]) {
         [listener forceAcquireLocation];
       }
     }
