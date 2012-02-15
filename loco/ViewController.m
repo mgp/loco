@@ -118,7 +118,10 @@ typedef enum {
   [events release];
   
   [tableViewHeader release];
+  mapView.delegate = nil;
   [mapView release];
+  [deviceLocation release];
+  [deviceLocationPin release];
   
   [super dealloc];
 }
@@ -177,6 +180,7 @@ typedef enum {
   // Create the map.
   CGFloat topOffset = 0;
   mapView = [[MKMapView alloc] initWithFrame:CGRectMake(10, topOffset, 300, 300)];
+  mapView.delegate = self;
   
   // Create the Pause button.
   topOffset += (300 + kHeaderElementMargin);
@@ -212,8 +216,6 @@ typedef enum {
   [tableViewHeader addSubview:pauseButton];
   [tableViewHeader addSubview:resumeButton];
   [tableViewHeader addSubview:forceAcquireButton];
-  
-  [mapView release];
 }
 
 - (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView {
@@ -255,10 +257,14 @@ typedef enum {
 }
 
 - (NSString *) stringFromLocation:(CLLocation *)location {
-  CLLocationCoordinate2D coordinate = location.coordinate;
-  return [NSString stringWithFormat:@"lat=%f, lon=%f",
-          coordinate.latitude,
-          coordinate.longitude];
+  if (location == nil) {
+    return @"nil";
+  } else {
+    CLLocationCoordinate2D coordinate = location.coordinate;
+    return [NSString stringWithFormat:@"lat=%f, lon=%f",
+            coordinate.latitude,
+            coordinate.longitude];
+  }
 }
 
 - (NSString *) stringFromLocationState:(LocationState)locationState {
@@ -341,6 +347,16 @@ typedef enum {
   return nil;
 }
 
+#pragma mark - MKMapViewDelegate methods.
+
+- (MKAnnotationView *) mapView:(MKMapView *)mapView
+             viewForAnnotation:(id<MKAnnotation>)annotation {
+  if (annotation == deviceLocation) {
+    return deviceLocationPin;
+  }
+  return nil;
+}
+
 #pragma mark - LocationManagerListener methods.
 
 - (void) addLocationEvent:(LocationEvent *)event {
@@ -369,11 +385,29 @@ typedef enum {
   if (newState != lastState) {
     lastState = newState;
     NSArray *indexPaths = [NSArray arrayWithObject:[NSIndexPath
-                                                    indexPathForRow:0
-                                                    inSection:0]];
+                                                    indexPathForRow:InfoRowState
+                                                    inSection:TableSectionStatus]];
     [self.tableView reloadRowsAtIndexPaths:indexPaths
                           withRowAnimation:UITableViewRowAnimationFade];
   }
+}
+
+- (void) updateLocation {
+  NSArray *indexPaths = [NSArray arrayWithObject:[NSIndexPath
+                                                  indexPathForRow:InfoRowCoords
+                                                  inSection:TableSectionStatus]];
+  [self.tableView reloadRowsAtIndexPaths:indexPaths
+                        withRowAnimation:UITableViewRowAnimationFade];
+  
+  if (deviceLocation == nil) {
+    deviceLocation = [[MKPointAnnotation alloc] init];
+    deviceLocation.title = @"You";
+    deviceLocationPin = [[MKPinAnnotationView alloc] initWithAnnotation:deviceLocation
+                                                        reuseIdentifier:nil];
+    
+    [mapView addAnnotation:deviceLocation];
+  }
+  deviceLocation.coordinate = locationManager.location.coordinate;
 }
 
 - (void) setLocation:(CLLocation *)location {
@@ -381,6 +415,7 @@ typedef enum {
   [self addLocationEventWithType:LocationEventTypeSetLocation
                         subtitle:subtitle];
   [self updateState];
+  [self updateLocation];
 }
 
 - (void) accessPrompted {
