@@ -12,7 +12,6 @@
   LocationState lastState;
   NSMutableArray *events;
   
-  UIView *tableViewHeader;
   MKMapView *mapView;
   MKPointAnnotation *deviceLocation;
   MKPinAnnotationView *deviceLocationPin;

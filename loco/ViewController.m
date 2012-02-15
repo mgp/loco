@@ -14,8 +14,6 @@ typedef enum {
   LocationEventTypeAcquiringLocationResumed,
 } LocationEventType;
 
-#define kButtonHeight 40
-
 @interface LocationEvent : NSObject {
 @private
   LocationEventType type;
@@ -99,8 +97,8 @@ typedef enum {
 } InfoRow;
 
 #define kHeaderElementMargin 10
-
-#pragma mark - View lifecycle
+#define kMapHeight 250
+#define kButtonHeight 40
 
 - (id) init {
   self = [super initWithStyle:UITableViewStyleGrouped];
@@ -117,7 +115,6 @@ typedef enum {
   [locationManager release];
   [events release];
   
-  [tableViewHeader release];
   mapView.delegate = nil;
   [mapView release];
   [deviceLocation release];
@@ -126,33 +123,32 @@ typedef enum {
   [super dealloc];
 }
 
+#pragma mark - UITableView methods.
+
 - (void) promptAuthorizationButtonPressed {
   [locationManager forcePromptAuthorization];
 }
 
-- (void) removeTableViewHeader {
-  [tableViewHeader removeFromSuperview];
-  [tableViewHeader release];
-  tableViewHeader = nil;
-}
-
 - (void) showStartTableHeader {
-  [self removeTableViewHeader];
+  CGFloat topOffset = kHeaderElementMargin;
   
   // Create the button.
   UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
   [button addTarget:self
              action:@selector(promptAuthorizationButtonPressed)
    forControlEvents:UIControlEventTouchUpInside];
-  button.frame = CGRectMake(0, 10, 300, kButtonHeight);
+  button.frame = CGRectMake(10, topOffset, 300, kButtonHeight);
   [button setTitle:@"Prompt Authorization" forState:UIControlStateNormal];
 
   // Show the button in the table header.
-  CGSize buttonSize = button.frame.size;
-  tableViewHeader =
+  CGFloat headerHeight = topOffset + kButtonHeight + kHeaderElementMargin;
+  UIView *tableHeaderView =
       [[UIView alloc]
-       initWithFrame:CGRectMake(0, 0, 320, buttonSize.height)];
-  [tableViewHeader addSubview:button];
+       initWithFrame:CGRectMake(0, 0, 320, headerHeight)];
+  [tableHeaderView addSubview:button];
+  
+  self.tableView.tableHeaderView = tableHeaderView;
+  [tableHeaderView release];
 }
 
 - (void) viewDidLoad {
@@ -175,15 +171,13 @@ typedef enum {
 }
 
 - (void) showMapTableHeader {
-  [self removeTableViewHeader];
-  
   // Create the map.
-  CGFloat topOffset = 0;
-  mapView = [[MKMapView alloc] initWithFrame:CGRectMake(10, topOffset, 300, 300)];
+  CGFloat topOffset = kHeaderElementMargin;
+  mapView = [[MKMapView alloc] initWithFrame:CGRectMake(10, topOffset, 300, kMapHeight)];
   mapView.delegate = self;
   
   // Create the Pause button.
-  topOffset += (300 + kHeaderElementMargin);
+  topOffset += (kMapHeight + kHeaderElementMargin);
   UIButton *pauseButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
   [pauseButton addTarget:self
                   action:@selector(pauseButtonPressed)
@@ -209,13 +203,16 @@ typedef enum {
   [forceAcquireButton setTitle:@"Force Acquire Location" forState:UIControlStateNormal];
   
   // Add everything to the table header.
-  CGFloat headerHeight = topOffset + kButtonHeight;
-  tableViewHeader = [[UIView alloc]
-                     initWithFrame:CGRectMake(0, 0, 320, headerHeight)];
-  [tableViewHeader addSubview:mapView];
-  [tableViewHeader addSubview:pauseButton];
-  [tableViewHeader addSubview:resumeButton];
-  [tableViewHeader addSubview:forceAcquireButton];
+  CGFloat headerHeight = topOffset + kButtonHeight + kHeaderElementMargin;
+  UIView *tableHeaderView = [[UIView alloc]
+                             initWithFrame:CGRectMake(0, 0, 320, headerHeight)];
+  [tableHeaderView addSubview:mapView];
+  [tableHeaderView addSubview:pauseButton];
+  [tableHeaderView addSubview:resumeButton];
+  [tableHeaderView addSubview:forceAcquireButton];
+  
+  self.tableView.tableHeaderView = tableHeaderView;
+  [tableHeaderView release];
 }
 
 - (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView {
@@ -261,7 +258,7 @@ typedef enum {
     return @"nil";
   } else {
     CLLocationCoordinate2D coordinate = location.coordinate;
-    return [NSString stringWithFormat:@"lat=%f, lon=%f",
+    return [NSString stringWithFormat:@"%f, %f",
             coordinate.latitude,
             coordinate.longitude];
   }
@@ -295,7 +292,9 @@ typedef enum {
     cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1
                                    reuseIdentifier:CellIdentifier]
             autorelease];
-    // TODO: set font sizes
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.textLabel.font = [UIFont boldSystemFontOfSize:16];
+    cell.detailTextLabel.font = [UIFont systemFontOfSize:15];
   }
   
   switch (row) {
@@ -323,8 +322,9 @@ typedef enum {
     cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
                                    reuseIdentifier:CellIdentifier]
             autorelease];
-    cell.textLabel.font = [UIFont boldSystemFontOfSize:13];
-    cell.detailTextLabel.font = [UIFont systemFontOfSize:11];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.textLabel.font = [UIFont boldSystemFontOfSize:16];
+    cell.detailTextLabel.font = [UIFont systemFontOfSize:15];
   }
   
   // The most recent event is the last element in the array.
@@ -347,6 +347,11 @@ typedef enum {
   return nil;
 }
 
+- (NSIndexPath *) tableView:(UITableView *)tableView
+   willSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+  return nil;
+}
+
 #pragma mark - MKMapViewDelegate methods.
 
 - (MKAnnotationView *) mapView:(MKMapView *)mapView
@@ -364,7 +369,7 @@ typedef enum {
   [self.tableView
    insertRowsAtIndexPaths:[NSArray arrayWithObject:[NSIndexPath
                                                     indexPathForRow:0
-                                                    inSection:0]]
+                                                    inSection:TableSectionEvents]]
    withRowAnimation:UITableViewRowAnimationLeft];
 }
 
@@ -406,8 +411,11 @@ typedef enum {
                                                         reuseIdentifier:nil];
     
     [mapView addAnnotation:deviceLocation];
+    // TODO: Zoom the map so location of initial coordinate is detailed.
   }
   deviceLocation.coordinate = locationManager.location.coordinate;
+  [mapView setCenterCoordinate:locationManager.location.coordinate
+                      animated:YES];
 }
 
 - (void) setLocation:(CLLocation *)location {
@@ -424,6 +432,8 @@ typedef enum {
 }
 
 - (void) accessGranted {
+  [self showMapTableHeader];
+  
   [self addLocationEventWithType:LocationEventTypeAccessGranted];
   [self updateState];
 }
