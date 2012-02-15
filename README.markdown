@@ -19,7 +19,6 @@ Additionally, the `LocationManager` has the following read-only properties:
 
 * `LocationState locationState`: An enumeration defining the state of the `LocationManager`. See the values below.
 * `CLLocation *location`: The last location acquired using GPS, or `nil` if no such location has been acquired yet.
-* `BOOL isPaused`: Returns whether monitoring for any changes in location has been paused.
 * `NSMutableArray *listeners`: The mutable array through which listeners can be registered or unregistered. See the description of the listener protocol below.
 
 ### LocationManagerState
@@ -38,7 +37,6 @@ The `LocationManagerState` enumeration specifies what the `LocationManager` is c
 A protocol that can be adopted by any class that wants to be notified of changes in location or changes to the state of the `LocationManager`. All methods are marked `optional`. To register or unregister listeners, simply add or remove them from the `listeners` property of the `LocationManager` instance.
 
 * `- (void) setLocation:(CLLocation *)location`: Called whenever the `LocationManager` determines a new location using GPS.
-* `- (void) setLocationState:(LocationState)locationState`: Called whenever the state of the `LocationManager` updates.
 * `- (void) accessPrompted`: Called whenever the application prompts the user for authorization to use location services.
 * `- (void) accessGranted`: Called if the user grants the application authorization to use location services.
 * `- (void) accessDenied`: Called if the user denies the application authorization to use location services.
