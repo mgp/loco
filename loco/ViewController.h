@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 
+#import "LocationManager.h"
 #import "LocationManagerListener.h"
 
 @class LocationManager;
@@ -7,6 +8,7 @@
 
 @interface ViewController : UITableViewController<LocationManagerListener> {
   LocationManager *locationManager;
+  LocationState lastState;
   NSMutableArray *events;
   
   UIView *tableViewHeader;
