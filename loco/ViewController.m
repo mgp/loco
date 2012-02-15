@@ -3,7 +3,6 @@
 #import <MapKit/MapKit.h>
 
 typedef enum {
-  LocationEventTypeSetLocationState,
   LocationEventTypeSetLocation,
   LocationEventTypeAccessPrompted,
   LocationEventTypeAccessGranted,
@@ -50,8 +49,6 @@ typedef enum {
 
 - (NSString *) title {
   switch (type) {
-    case LocationEventTypeSetLocationState:
-      return @"SetLocationState";
     case LocationEventTypeSetLocation:
       return @"SetLocation";
     case LocationEventTypeAccessPrompted:
@@ -308,12 +305,6 @@ typedef enum {
 - (void) setLocation:(CLLocation *)location {
   NSString *subtitle = [self stringFromLocation:location];
   [self addLocationEventWithType:LocationEventTypeSetLocation
-                        subtitle:subtitle];
-}
-
-- (void) setLocationState:(LocationState)locationState {
-  NSString *subtitle = [self stringFromLocationState:locationState];
-  [self addLocationEventWithType:LocationEventTypeSetLocationState
                         subtitle:subtitle];
 }
 

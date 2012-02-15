@@ -9,7 +9,6 @@
 @optional
 
 - (void) setLocation:(CLLocation *)coordinate;
-- (void) setLocationState:(LocationState)locationState;
 - (void) accessPrompted;
 - (void) accessGranted;
 - (void) accessDenied;
