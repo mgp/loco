@@ -22,6 +22,8 @@
 // Maximum number of seconds to keep the GPS on for.
 #define kMaxGpsOnTime 15
 
+#define LOCO_LOG 0
+
 @synthesize locationState;
 @synthesize location;
 @synthesize listeners;
@@ -77,7 +79,15 @@ static LocationManager *singleton;
 }
 
 - (void) acquiringLocationTimerExpired {
+#if LOCO_LOG
+  NSLog(@"Timer for acquiring location expired");
+#endif
+  
   if ((acquiringLocation == nil) || ![self isAcquiredLocationAccurate]) {
+#if LOCO_LOG
+    NSLog(@" No location acquired or location is not accurate");
+#endif
+    
     // The location we acquired is not accurate enough, so discard it.
     [acquiringLocation release];
     acquiringLocation = nil;
@@ -88,6 +98,9 @@ static LocationManager *singleton;
       }
     }
   } else  {
+#if LOCO_LOG
+    NSLog(@" Acquired location is accurate");
+#endif
     [self finishAcquiringLocation];
   }
 
@@ -172,12 +185,18 @@ static LocationManager *singleton;
   if ((locationState == LocationStateInit) ||
       (locationState == LocationStateDenied) ||
       (locationState == LocationStatePaused)) {
-    NSLog(@"Got new location when locationState=%d", locationState);
+#if LOCO_LOG
+    NSLog(@"Updated location when locationState=%d", locationState);
+#endif
     return;
   }
   
   failedUpdateAttempts = 0;
   if (locationState == LocationStatePrompted) {
+#if LOCO_LOG
+    NSLog(@"Updated location when locationState=Prompted");
+#endif
+    
     // If got an update, then location access was granted.
     [self startAcquiringLocation];
     
@@ -190,11 +209,18 @@ static LocationManager *singleton;
   }
 
   if (locationState == LocationStateWaitingSignificantChange) {
+#if LOCO_LOG
+    NSLog(@"Updated location when locationState=WaitingSignificantChange");
+#endif
+    
     if (location != nil) {
       // Ignore change if acquired location using GPS recently.
       NSTimeInterval secondsSinceExactLocation = [newLocation.timestamp
                                                   timeIntervalSinceDate:location.timestamp];
       if (secondsSinceExactLocation < kMinSecondsSignificantChange) {
+#if LOCO_LOG
+        NSLog(@" Significant change timestamp is too recent, discarding update");
+#endif
         return;
       }
     }
@@ -215,19 +241,27 @@ static LocationManager *singleton;
   }
   
   if (locationState == LocationStateAcquiring) {
+#if LOCO_LOG
+    NSLog(@"Updated location when locationState=Acquiring");
+#endif
+    
     if (significantChangeTimestamp == nil) {
       // If acquiring the first location, it must be recent.
       NSTimeInterval locationAgeInSeconds = [[NSDate date]
                                              timeIntervalSinceDate:newLocation.timestamp];
       if (locationAgeInSeconds >= kMaxSecondsRecentUpdate) {
-        NSLog(@"First location with GPS is stale");
+#if LOCO_LOG
+        NSLog(@" First acquired location timestamp is stale, discarding update");
+#endif
         return;
       }
     } else {
       // If not the first location, it must follow the significant location change.
       if ([newLocation.timestamp
            compare:significantChangeTimestamp] != NSOrderedDescending) {
-        NSLog(@"Next location with GPS is stale");
+#if LOCO_LOG
+        NSLog(@" Next acquired location timestamp is stale, discarding update");
+#endif
         return;
       }
     }
@@ -235,15 +269,26 @@ static LocationManager *singleton;
     // The horizontalAccuracy does not use the CLLocationAccuracy constants. If
     // negative, it is invalid, and not kCLLocationAccuracyBest.
     if (newLocation.horizontalAccuracy < 0) {
+#if LOCO_LOG
+      NSLog(@" Accuracy is too low, discarding update");
+#endif
       return;
     }
     
     if ((acquiringLocation == nil) ||
         (newLocation.horizontalAccuracy <= acquiringLocation.horizontalAccuracy)) {
+#if LOCO_LOG
+      NSLog(@" Updated location has better accuracy, replacing acquired location");
+#endif
+      
       [acquiringLocation release];
       acquiringLocation = [newLocation retain];
       
       if ([self isAcquiredLocationAccurate]) {
+#if LOCO_LOG
+        NSLog(@" Acquired location is accurate, monitoring significant location changes again");
+#endif
+        
         // Switch back to monitoring significant location changes.
         [self stopAcquiringLocation];
         [self startMonitoringSignificantChanges];
@@ -261,11 +306,19 @@ static LocationManager *singleton;
       (locationState == LocationStateDenied) ||
       (locationState == LocationStateWaitingSignificantChange) ||
       (locationState == LocationStatePaused)) {
-    NSLog(@"Failed to get new location when locationState=%d", locationState);
+    NSLog(@"Failed to update location when locationState=%d", locationState);
   }
   
   if (locationState == LocationStatePrompted) {
+#if LOCO_LOG
+    NSLog(@"Failed to update location when locationState=Prompted");
+#endif
+    
     if (error.code == kCLErrorDenied) {
+#if LOCO_LOG
+      NSLog(@" User denied application authorization to location services");
+#endif
+      
       // The user denied the application authorization to use location services.
       [self stopAcquiringLocation];
 
@@ -289,9 +342,17 @@ static LocationManager *singleton;
   }
 
   if (locationState == LocationStateAcquiring) {
+#if LOCO_LOG
+    NSLog(@"Failed to update location when locationState=Acquiring");
+#endif
+    
     ++failedUpdateAttempts;
 
     if (failedUpdateAttempts >= kMaxFailedUpdateAttempts) {
+#if LOCO_LOG
+      NSLog(@" Too many failures, monitoring significant location changes again");
+#endif
+      
       // Failed too many times to acquire the location again, so stop for now.
       [self stopAcquiringLocation];
       [self startMonitoringSignificantChanges];
