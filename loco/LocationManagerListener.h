@@ -12,7 +12,7 @@
 @optional
 
 // A new location is found using GPS.
-- (void) setLocation:(CLLocation *)coordinate;
+- (void) setLocation:(CLLocation *)location;
 // The application prompts the user for authorization to use location services.
 - (void) accessPrompted;
 // The user grants the application authorization to use location services.
