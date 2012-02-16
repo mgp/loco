@@ -11,6 +11,7 @@
   LocationManager *locationManager;
   LocationState lastState;
   NSMutableArray *events;
+  NSDateFormatter *dateFormatter;
   
   MKMapView *mapView;
   MKPointAnnotation *deviceLocation;

@@ -18,12 +18,10 @@ typedef enum {
 @private
   LocationEventType type;
   NSString *subtitle;
-  NSDate *date;
 }
 
 @property (nonatomic, readonly) LocationEventType type;
 @property (nonatomic, readonly) NSString *subtitle;
-@property (nonatomic, readonly) NSDate *date;
 
 - (id) initWithType:(LocationEventType)type subtitle:(NSString *)subtitle;
 
@@ -36,7 +34,6 @@ typedef enum {
 
 @synthesize type;
 @synthesize subtitle;
-@synthesize date;
 
 - (id) initWithType:(LocationEventType)typeParam
            subtitle:(NSString *)subtitleParam {
@@ -44,14 +41,12 @@ typedef enum {
   if (self) {
     type = typeParam;
     subtitle = [subtitleParam retain];
-    date = [[NSDate alloc] init];
   }
   return self;
 }
 
 - (void) dealloc {
   [subtitle release];
-  [date release];
   [super dealloc];
 }
 
@@ -107,6 +102,9 @@ typedef enum {
     [locationManager.listeners addObject:self];
     lastState = locationManager.locationState;
     events = [[NSMutableArray alloc] init];
+    dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateStyle = NSDateFormatterNoStyle;
+    dateFormatter.timeStyle = NSDateFormatterShortStyle;
   }
   return self;
 }
@@ -114,6 +112,7 @@ typedef enum {
 - (void) dealloc {
   [locationManager release];
   [events release];
+  [dateFormatter release];
   
   mapView.delegate = nil;
   [mapView release];
@@ -382,8 +381,15 @@ typedef enum {
 
 - (void) addLocationEventWithType:(LocationEventType)type
                          subtitle:(NSString *)subtitle {
+  NSString *time = [dateFormatter stringFromDate:[NSDate date]];
+  NSString *fullSubtitle = nil;
+  if (subtitle == nil) {
+    fullSubtitle = time;
+  } else {
+    fullSubtitle = [NSString stringWithFormat:@"%@: %@", time, subtitle];
+  }
   LocationEvent *event = [[LocationEvent alloc] initWithType:type
-                                                    subtitle:subtitle];
+                                                    subtitle:fullSubtitle];
   [self addLocationEvent:event];
   [event release];
 }
