@@ -366,11 +366,18 @@ typedef enum {
 
 - (void) addLocationEvent:(LocationEvent *)event {
   [events addObject:event];
-  [self.tableView
-   insertRowsAtIndexPaths:[NSArray arrayWithObject:[NSIndexPath
-                                                    indexPathForRow:0
-                                                    inSection:TableSectionEvents]]
-   withRowAnimation:UITableViewRowAnimationLeft];
+  if ([events count] > 1) {
+    [self.tableView
+     insertRowsAtIndexPaths:[NSArray arrayWithObject:[NSIndexPath
+                                                      indexPathForRow:0
+                                                      inSection:TableSectionEvents]]
+     withRowAnimation:UITableViewRowAnimationLeft];
+  } else {
+    // Reload after adding the first event to remove the section footer.
+    [self.tableView reloadSections:[NSIndexSet
+                                    indexSetWithIndex:TableSectionEvents]
+                  withRowAnimation:UITableViewRowAnimationLeft];
+  }
 }
 
 - (void) addLocationEventWithType:(LocationEventType)type
@@ -406,12 +413,17 @@ typedef enum {
   
   if (deviceLocation == nil) {
     deviceLocation = [[MKPointAnnotation alloc] init];
-    deviceLocation.title = @"You";
     deviceLocationPin = [[MKPinAnnotationView alloc] initWithAnnotation:deviceLocation
                                                         reuseIdentifier:nil];
     
+    // Zoom in when showing the device location on the map.
     [mapView addAnnotation:deviceLocation];
-    // TODO: Zoom the map so location of initial coordinate is detailed.
+    MKCoordinateRegion zoomedRegion =
+        MKCoordinateRegionMakeWithDistance(locationManager.location.coordinate,
+                                           1000,
+                                           1000);
+    MKCoordinateRegion fittedRegion = [mapView regionThatFits:zoomedRegion];
+    [mapView setRegion:fittedRegion animated:YES];
   }
   deviceLocation.coordinate = locationManager.location.coordinate;
   [mapView setCenterCoordinate:locationManager.location.coordinate
