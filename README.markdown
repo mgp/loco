@@ -59,3 +59,5 @@ The other files in the repository are part of the XCode project `loco.xcodeproj`
   * watch your location update on the map
   * inspect which listener methods are called
 
+For best results in the iPhone simulator, choose the "Freeway Drive" option under "Debug" > "Location" and wait for significant changes in location to be found. (This can take up to five or ten minutes, unfortunately.)
+

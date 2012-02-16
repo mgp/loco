@@ -1,14 +1,24 @@
-// Finds the user's location.
+// Monitors changes in cellular towers and acquiring the location using GPS in
+// response.
+//
+// See https://github.com/mgp/loco for complete documentation.
 
 #import <CoreLocation/CoreLocation.h>
 #import <Foundation/Foundation.h>
 
+// Enumeration that specifies what the LocationManager is currently doing.
 typedef enum {
+  // Not prompted the user yet for authorization to use location services.
   LocationStateInit,
+  // Prompting the user to authorize the application use of location services.
   LocationStatePrompted,
+  // The user denied the application authorization to use location services.
   LocationStateDenied,
+  // Waiting for a change in cellular towers.
   LocationStateWaitingSignificantChange,
+  // Acquiring the device location using GPS.
   LocationStateAcquiring,
+  // Monitoring for any changes in location has been paused.
   LocationStatePaused,
 } LocationState;
 
@@ -24,24 +34,32 @@ typedef enum {
   NSUInteger failedUpdateAttempts;
 }
 
+// An enumeration defining the state of the LocationManager.
 @property (nonatomic, readonly) LocationState locationState;
+// The last location acquired using GPS, or nil if no such location has been
+// acquired yet.
 @property (nonatomic, readonly) CLLocation *location;
+// The mutable array containing registered listeners.
 @property (nonatomic, readonly) NSMutableArray *listeners;
 
 + (LocationManager *) sharedInstance;
 
-// Prompts the user to grant the application location access unless already denied.
+// If the user has not already declined authorization, prompts the user to
+// authorize the application use of location services.
 - (void) tryPromptAuthorization;
-// Prompts the user to grant the application location access.
+// Regardless of whether the user has already declined authorization, prompts
+// the user to authorize the application use of location services.
 - (void) forcePromptAuthorization;
 
-// Pauses all location monitoring.
+// If location access has been enabled, pauses monitoring for any changes in
+// location.
 - (void) pause;
-// Resumes all location monitoring. This will implicitly force acquiring the
-// user's exact location.
+// If location access has been enabled but is paused, resumes monitoring for any
+// changes in location. This implicitly calls forceAcquireLocation below.
 - (void) resume;
 
-// Force reading the user's exact location 
+// Attempts to acquire the device location using GPS instead of waiting for a
+// change in cellular towers to trigger acquisition.
 - (void) forceAcquireLocation;
 
 @end
