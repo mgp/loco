@@ -51,6 +51,7 @@ static LocationManager *singleton;
   [location release];
   [listeners release];
 
+  manager.delegate = nil;
   [manager release];
   [acquiringLocation release];
   [significantChangeTimestamp release];
