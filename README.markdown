@@ -1,6 +1,8 @@
 # Loco
 
-Loco is an iOS library that attempts to acquire the device location using GPS whenever a significant location change, or change in cellular towers, is detected. By doing so it strikes a balance between accurately finding your **lo**cation and **co**nserving the battery of your device. Other features include allowing the application to force attempting to acquire the location using GPS at any time, a listener interface for easy notification of changes in location and other events, and pausing and resuming monitoring of location.
+Loco is an iOS library that attempts to acquire the device location using GPS whenever a significant location change, or change in cellular towers, is detected. By doing so it strikes a balance between accurately finding your **lo**cation and **co**nserving the battery of your device. The interface allows easily prompting the user for authorization to location services, forcing acquisition of the location using GPS at any time, pausing and resuming monitoring of location, and registering listeners for notification of location changes or events. The implementation handles ignoring location updates with stale timestamps, and processing updates until one with high accuracy is found or a short amount of time passes.
+
+Thoroughly tested in the iPhone simulator and on the 101 freeway in Los Angeles.
 
 ## API
 
