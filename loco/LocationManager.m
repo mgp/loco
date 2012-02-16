@@ -21,6 +21,10 @@
 #define kMaxFailedUpdateAttempts 5
 // Maximum number of seconds to keep the GPS on for.
 #define kMaxGpsOnTime 15
+// The desired accuracy of an acquired location.
+#define kDesiredLocationAccuracy kCLLocationAccuracyNearestTenMeters
+// The acceptable accuracy of an acquired location when the GPS timer expires.
+#define kAcceptableLocationAccuracy kCLLocationAccuracyHundredMeters
 
 #define LOCO_LOG 0
 
@@ -61,8 +65,8 @@ static LocationManager *singleton;
   return singleton;
 }
 
-- (BOOL) isAcquiredLocationAccurate {
-  return (acquiringLocation.horizontalAccuracy < kCLLocationAccuracyNearestTenMeters);
+- (BOOL) locationHasMinimumAccuracy:(CLLocationAccuracy)minimumAccuracy {
+  return (acquiringLocation.horizontalAccuracy <= minimumAccuracy);
 }
 
 - (void) finishAcquiringLocation {
@@ -83,7 +87,8 @@ static LocationManager *singleton;
   NSLog(@"Timer for acquiring location expired");
 #endif
   
-  if ((acquiringLocation == nil) || ![self isAcquiredLocationAccurate]) {
+  if ((acquiringLocation == nil) ||
+      ![self locationHasMinimumAccuracy:kAcceptableLocationAccuracy]) {
 #if LOCO_LOG
     NSLog(@" No location acquired or location is not accurate");
 #endif
@@ -284,7 +289,7 @@ static LocationManager *singleton;
       [acquiringLocation release];
       acquiringLocation = [newLocation retain];
       
-      if ([self isAcquiredLocationAccurate]) {
+      if ([self locationHasMinimumAccuracy:kDesiredLocationAccuracy]) {
 #if LOCO_LOG
         NSLog(@" Acquired location is accurate, monitoring significant location changes again");
 #endif
