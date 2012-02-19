@@ -134,7 +134,7 @@ static LocationManager *singleton;
 }
 
 - (void) stopMonitoringSignificantChanges {
-  [manager stopUpdatingLocation];
+  [manager stopMonitoringSignificantLocationChanges];
 }
 
 - (void) stopAcquiringLocation {
