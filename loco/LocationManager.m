@@ -76,6 +76,7 @@ static LocationManager *singleton;
   location = acquiringLocation;
   acquiringLocation = nil;
   
+  // Notify the listeners last.
   for (NSObject<LocationManagerListener> *listener in listeners) {
     if ([listener respondsToSelector:@selector(setLocation:)]) {
       [listener setLocation:location];
@@ -98,6 +99,11 @@ static LocationManager *singleton;
     [acquiringLocation release];
     acquiringLocation = nil;
     
+    // Switch back to monitoring significant location changes.
+    [self stopAcquiringLocation];
+    [self startMonitoringSignificantChanges];
+    
+    // Notify the listeners last.
     for (NSObject<LocationManagerListener> *listener in listeners) {
       if ([listener respondsToSelector:@selector(acquiringLocationFailed)]) {
         [listener acquiringLocationFailed];
@@ -107,12 +113,13 @@ static LocationManager *singleton;
 #if LOCO_LOG
     NSLog(@" Acquired location is accurate");
 #endif
+    
+    // Switch back to monitoring significant location changes.
+    [self stopAcquiringLocation];
+    [self startMonitoringSignificantChanges];
+    
     [self finishAcquiringLocation];
   }
-
-  // Switch back to monitoring significant location changes.
-  [self stopAcquiringLocation];
-  [self startMonitoringSignificantChanges];
 }
 
 - (void) cancelAcquiringLocationTimer {
@@ -163,6 +170,7 @@ static LocationManager *singleton;
   [manager startUpdatingLocation];
   
   locationState = LocationStatePrompted;
+  // Notify the listeners last.
   for (NSObject<LocationManagerListener> *listener in listeners) {
     if ([listener respondsToSelector:@selector(accessPrompted)]) {
       [listener accessPrompted];
@@ -206,6 +214,7 @@ static LocationManager *singleton;
     // If got an update, then location access was granted.
     [self startAcquiringLocation];
     
+    // Notify the listeners last.
     for (NSObject<LocationManagerListener> *listener in listeners) {
       if ([listener respondsToSelector:@selector(accessGranted)]) {
         [listener accessGranted];
@@ -238,6 +247,7 @@ static LocationManager *singleton;
     [self stopMonitoringSignificantChanges];
     [self startAcquiringLocation];
 
+    // Notify the listeners last.
     for (NSObject<LocationManagerListener> *listener in listeners) {
       if ([listener respondsToSelector:@selector(significantChangeDetected:)]) {
         [listener significantChangeDetected:newLocation];
@@ -329,6 +339,7 @@ static LocationManager *singleton;
       [self stopAcquiringLocation];
 
       locationState = LocationStateDenied;
+      // Notify the listeners last.
       for (NSObject<LocationManagerListener> *listener in listeners) {
         if ([listener respondsToSelector:@selector(accessDenied)]) {
           [listener accessDenied];
@@ -338,6 +349,7 @@ static LocationManager *singleton;
       // Location access was granted, but acquisition failed.
       [self startAcquiringLocation];
       
+      // Notify the listeners last.
       for (NSObject<LocationManagerListener> *listener in listeners) {
         if ([listener respondsToSelector:@selector(accessGranted)]) {
           [listener accessGranted];
@@ -363,6 +375,7 @@ static LocationManager *singleton;
       [self stopAcquiringLocation];
       [self startMonitoringSignificantChanges];
 
+      // Notify the listeners last.
       for (NSObject<LocationManagerListener> *listener in listeners) {
         if ([listener respondsToSelector:@selector(acquiringLocationFailed)]) {
           [listener acquiringLocationFailed];
@@ -387,6 +400,7 @@ static LocationManager *singleton;
   }
 
   locationState = LocationStatePaused;
+  // Notify the listeners last.
   for (NSObject<LocationManagerListener> *listener in listeners) {
     if ([listener respondsToSelector:@selector(acquiringLocationPaused)]) {
       [listener acquiringLocationPaused];
@@ -398,6 +412,7 @@ static LocationManager *singleton;
   if (locationState == LocationStatePaused) {
     [self startAcquiringLocation];
 
+    // Notify the listeners last.
     for (NSObject<LocationManagerListener> *listener in listeners) {
       if ([listener respondsToSelector:@selector(acquiringLocationResumed)]) {
         [listener acquiringLocationResumed];
@@ -411,6 +426,7 @@ static LocationManager *singleton;
     [self stopMonitoringSignificantChanges];
     [self startAcquiringLocation];
     
+    // Notify the listeners last.
     for (NSObject<LocationManagerListener> *listener in listeners) {
       if ([listener respondsToSelector:@selector(forceAcquireLocation)]) {
         [listener forceAcquireLocation];
