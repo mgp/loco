@@ -2,7 +2,7 @@
 
 Loco is an iPhone library that simplifies location acquisition. It acquires the device location using GPS whenever a change in cellular towers is detected, thereby striking a balance between accurately finding your **lo**cation and **co**nserving the battery of your device. The interface allows easily prompting the user for authorization to location services, forcing acquisition of the location using GPS at any time, pausing and resuming monitoring of location, and registering listeners for notification of location changes or events. The implementation takes care of ignoring location updates with stale timestamps, and only keeping the GPS on until a location update with high accuracy is found or a short amount of time passes.
 
-Thoroughly tested in the iPhone simulator and on the 101 freeway in Los Angeles. Released under the MIT license. To be used in the next version of [ReadyUp!](http://readyupapp.com)
+Thoroughly tested in the iPhone simulator and on the 101 freeway in Los Angeles. Released under the MIT license. Used in [ReadyUp!](http://readyupapp.com)
 
 ## API
 
